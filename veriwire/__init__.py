@@ -1,0 +1,2 @@
+# VeriWire package init
+

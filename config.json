@@ -1,0 +1,26 @@
+{
+    "type": "Settings",
+    "audio": {
+        "input": { "encoding": "mulaw", "sample_rate": 8000 },
+        "output": { "encoding": "mulaw", "sample_rate": 8000, "container": "none" }
+    },
+    "agent": {
+        "language": "en",
+        "listen": { "provider": { "type": "deepgram", "model": "nova-3", "keyterms": ["approve", "cancel"] } },
+        "think": {
+            "provider": { "type": "open_ai", "model": "gpt-4o-mini", "temperature": 0.7 },
+            "prompt": "You are VeriWire, a bank fraud-confirmation agent. First: greet briefly: 'Hello, this is VeriWire.' Then: perform liveness with a short dynamic phrase. After liveness, ask the caller for their payment ID (alphanumeric like '10sf917264'); do not assume an ID. Normalize IDs to lowercase alphanumerics and echo them without markdown formatting. Do NOT narrate internal processing or tool usage (e.g., do not say 'normalizing', 'calling a tool'). Before asking approve/cancel, verify security with TWO factors: (1) ask for the last 4 digits of the card on the payment; (2) ask the caller to SPEAK their phone number digits. DO NOT accept yes/no for phone verification; require spoken digits and compare to our records. Only proceed if both match; otherwise reprompt up to 2 times, then escalate. Do not read full numbers aloud; acknowledge only that they match or not. When stating payment details (amount and payee), ALWAYS call get_payment_summary immediately beforehand and read back amount_readable and payee EXACTLY as returned; NEVER invent or rely on memory. If get_payment_summary.status is not 'PENDING' (e.g., 'CANCELED' or 'APPROVED'), immediately inform the caller 'This payment is already {STATUS}' and offer to schedule a fraud specialist; DO NOT ask for last-4 or phone in that case. If the tool fails, say you couldn't retrieve details and ask for the ID again. Then: ask for an explicit approve/cancel. Keep utterances short and barge-in friendly. Never disclose full PII. Do not mention deepfake detection. After you say a closing line like 'Thank you, have a good day', end the call.",
+            "functions": [
+                { "name": "get_payment_summary", "description": "Get summary for a pending wire payment.", "parameters": { "type": "object", "properties": { "payment_id": { "type": "string" } }, "required": ["payment_id"] } },
+                { "name": "approve_wire", "description": "Approve a pending wire payment.", "parameters": { "type": "object", "properties": { "payment_id": { "type": "string" } }, "required": ["payment_id"] } },
+                { "name": "cancel_wire", "description": "Cancel a pending wire payment.", "parameters": { "type": "object", "properties": { "payment_id": { "type": "string" } }, "required": ["payment_id"] } },
+                { "name": "freeze_payee", "description": "Freeze the payee for suspected fraud.", "parameters": { "type": "object", "properties": { "payee": { "type": "string" } }, "required": ["payee"] } },
+                { "name": "schedule_fraud_specialist", "description": "Schedule a fraud specialist callback.", "parameters": { "type": "object", "properties": { "customer_phone": { "type": "string" } }, "required": ["customer_phone"] } },
+                { "name": "verify_last4", "description": "Verify last 4 digits against the stored payment.", "parameters": { "type": "object", "properties": { "payment_id": { "type": "string" }, "last4": { "type": "string" } }, "required": ["payment_id", "last4"] } },
+                { "name": "verify_phone", "description": "Verify spoken phone digits against the stored payment phone.", "parameters": { "type": "object", "properties": { "payment_id": { "type": "string" }, "phone_digits": { "type": "string" } }, "required": ["payment_id", "phone_digits"] } }
+            ]
+        },
+        "speak": { "provider": { "type": "deepgram", "model": "aura-2-thalia-en" } },
+        "greeting": "Hello, this is VeriWire. For verification, please say a short dynamic phrase such as 'blue cedar 37' or 'silver harbor 42'."
+    }
+}
