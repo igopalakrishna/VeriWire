@@ -211,12 +211,6 @@ Add integration tests for:
 
 ---
 
-## AI Assistant Usage Disclosure
-
-An AI coding assistant was used for scaffolding, refactors, and boilerplate. All logic, prompts, and tests were reviewed and validated locally (pytest + sandbox) and with live call trials. Prompts avoid internal narration and enforce tool-backed readouts and PII policy.
-
----
-
 ## License
 
 This project is provided for interview and educational purposes. Please adapt the license for your organization’s needs.
